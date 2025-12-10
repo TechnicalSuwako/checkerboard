@@ -6,17 +6,21 @@ bits 64
 default rel
 
 section .data
-  hdr2 db "960 540", 10
-  hdr3 db "255", 10
 
 section .rodata
   outfile db "output.ppm", 0
-  hdr1 db "P6", 10
+  hdr db "P6", 10, "960 540", 10, "255", 10
+
   err db "開くに失敗", 10
   errlen equ $-err
+  suc db "画像を「output.ppm」に出力しました。", 10
+  suclen equ $-suc
 
   w equ 960
   h equ 540
+
+section .bss
+  buf resb 960*540*3
 
 section .text
   global _start
@@ -35,33 +39,78 @@ _start:
 
   test rax, rax
   js error            ; エラーがあれば
-  mov rbx, rax        ; ファイルディスクリプターをrbxに保存
+  mov r15, rax        ; ファイルディスクリプターをrbxに保存
 
-  mov rax, 4          ; sys_write
-  mov rdi, rbx        ; fd
-  lea rsi, [hdr1]
-  mov rdx, 3
+  ; ヘッダーの書き込み
+  mov eax, 4          ; sys_write
+  mov rdi, r15        ; fd
+  lea rsi, [hdr]
+  mov rdx, 18
+  syscall
+
+  ; チェッカーボードループ
+  lea rdi, [buf]
+  mov rcx, h
+
+yloop:
+  mov r8d, w
+
+xloop:
+  ; (x/60 + y/60) % 2の計算
+  mov eax, r8d
+  xor edx, edx
+  mov ebx, 60
+  div ebx             ; eax = x/60
+  push rax
+
+  mov eax, ecx
+  xor edx, edx
+  div ebx             ; eax = y/60
+  pop rdx
+  add eax, edx        ; x/60 + y/60
+  and al, 1           ; % 2
+  jz .black
+
+  mov al, 0
+  stosb               ; R
+  mov al, 0xFF
+  stosb               ; G
+  mov al, 0
+  stosb               ; B
+  jmp .next
+
+.black:
+  xor eax, eax
+  stosb
+  stosb
+  stosb
+
+.next:
+  dec r8d
+  jnz xloop
+  loop yloop          ; dec rcx, jnz yloop
+
+  ; ピクセルデータの書き込み
+  mov eax, 4
+  mov rdi, r15
+  lea rsi, [buf]
+  mov edx, 960*540*3
   syscall
 
   mov rax, 4
-  mov rdi, rbx
-  lea rsi, [hdr2]
-  mov rdx, 8
+  mov rdi, 1
+  lea rsi, [suc]
+  mov rdx, suclen
   syscall
 
-  mov rax, 4
-  mov rdi, rbx
-  lea rsi, [hdr3]
-  mov rdx, 4
-  syscall
-
+close:
   mov rax, 6          ; sys_close
-  mov rdi, rbx
+  mov rdi, r15
   syscall
 
 end:
-  mov rax, 1          ; sys_exit
-  xor rdi, rdi
+  mov eax, 1          ; sys_exit
+  xor edi, edi
   syscall
 
 error:
