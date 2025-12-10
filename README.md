@@ -5,4 +5,11 @@ Linuxを使っている人は、システムコール番号だけ変更すれば
 其れ以外は同じ様に動くはずです。\
 但し、実際にテストしたのはFreeBSDのみです。
 
+## 必要なツール
+* FreeBSD (OS)
+* nasm (アセンブラー)
+* ffmpeg (MP4に出力の場合)
+* ImageMagick (GIFに出力の場合)
+
+## 結果
 ![](output.gif)
