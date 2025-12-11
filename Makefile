@@ -7,6 +7,7 @@ mp4: build run convert-mp4 clean
 build:
 	nasm -f elf64 main.s -o main.o
 	ld main.o -o gen
+	strip gen
 
 run:
 	./gen
@@ -18,6 +19,6 @@ convert-mp4:
 	ffmpeg -i output-%02d.ppm -r 60 output.mp4
 
 clean:
-	rm -rf output-*.ppm
+	rm -rf output-*.ppm *.o *.core
 
 .PHONY: all gif mp4 build run convert-gif convert-mp4 clean

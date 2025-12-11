@@ -51,7 +51,7 @@ frameloop:
   lea rsi, [suffix]
   call strcpy         ; 「.ppm\0」の追加
 
-  mov rax, 5          ; sys_openat
+  mov rax, 5          ; sys_open
   lea rdi, [outfile]
   mov rsi, 0x100601   ; 0x100601 = 0001 0000 0000 0110 0000 0001 = 1048576 + 1024 + 512 + 1 = 1050113
                       ;   O_WRONLY  = 0x0001
