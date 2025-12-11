@@ -64,7 +64,7 @@ frameloop:
 
   test rax, rax
   js error            ; エラーがあれば
-  mov r15, rax        ; ファイルディスクリプターをrbxに保存
+  mov r15, rax        ; ファイルディスクリプターをr15に保存
 
   ; ヘッダーの書き込み
   mov eax, 4          ; sys_write
