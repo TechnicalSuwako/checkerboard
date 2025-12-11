@@ -1,5 +1,5 @@
-; FreeBSDで、死すコール番号を調べるには：/usr/include/sys/syscall.h
-; Linuxで、死すコール番号を調べるには：/usr/include/asm-generic/unistd.h
+; FreeBSDで、シスコール番号を調べるには：/usr/include/sys/syscall.h
+; Linuxで、シスコール番号を調べるには：/usr/include/asm-generic/unistd.h
 ; 下記のコードはFreeBSD向けの物です。
 
 bits 64
